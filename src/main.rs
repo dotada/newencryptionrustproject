@@ -69,7 +69,7 @@ fn main() -> Result<(), Box<dyn Error>>{
 	println!("{}", newest_string);
 	let args: Vec<String> = std::env::args().collect();
 	if args.len() < 3 {
-		println!("Usage: {} <encryot/decrypt> <path>", args[0]);
+		println!("Usage: {} <encrypt/decrypt> <path>", args[0]);
 		exit(1);
 	}
 	let path = &args[2];
