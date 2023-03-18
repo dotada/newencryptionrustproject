@@ -97,7 +97,7 @@ fn main() -> Result<(), Box<dyn Error>>{
 				let mut key_value: Option<String> = None;
 				let checkquery = format!(
 					"SELECT `key` FROM `{}`;"
-				, uuid);
+				, uuid.trim());
 				let result = conn.query_iter(checkquery).unwrap();
 				for row in result {
 					let key: String = mysql::from_row(row.unwrap());
