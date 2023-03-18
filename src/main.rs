@@ -90,11 +90,14 @@ fn main() -> Result<(), Box<dyn Error>>{
 					}		
 			}
 			if args[1] == "decrypt"{
+				let mut uuid = String::new();
+				println!("Please enter your UUID for decryption: ");
+				std::io::stdin().read_line(&mut uuid).unwrap();
 				let files = getfiles(path)?;
 				let mut key_value: Option<String> = None;
 				let checkquery = format!(
-					"SELECT `key` FROM `32fe76c702e0462e989a8d8185e12bab`;"
-				);
+					"SELECT `key` FROM `{}`;"
+				, uuid);
 				let result = conn.query_iter(checkquery).unwrap();
 				for row in result {
 					let key: String = mysql::from_row(row.unwrap());
