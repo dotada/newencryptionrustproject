@@ -887,7 +887,6 @@ dependencies = [
  "mysql",
  "orion",
  "uuid",
- "zeroize",
 ]
 
 [[package]]

