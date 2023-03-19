@@ -4,7 +4,7 @@ use orion::{aead, kex::SecretKey};
 use std::error::Error;
 use std::sync::Arc;
 use std::{
-    fs::{OpenOptions},
+    fs::OpenOptions,
     io::{Read, Write},
     process::exit,
 };
@@ -107,11 +107,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         for file in files {
             let mut fileopen = OpenOptions::new().write(true).open(&file).unwrap();
             let filecont = readfile(file)?;
-			if filecont.trim() != "" {
-				let decced = decrypt(&filecont, key_str.clone())?;
-            	fileopen.set_len(0)?;
-            	fileopen.write(decced.as_bytes())?;
-			}
+            if filecont.trim() != "" {
+                let decced = decrypt(&filecont, key_str.clone())?;
+                fileopen.set_len(0)?;
+                fileopen.write(decced.as_bytes())?;
+            }
         }
     }
     println!("Press enter to exit.");
